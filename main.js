@@ -1,33 +1,68 @@
-const salaryData = [
-  { role: 'CTO', company: 'Big Data Inc.', salary: 320000},
-  { role: 'Technical Lead', company: 'Big Data Inc.', salary: 230000},
-  { role: 'Software Engineer II', company: 'Big Data Inc.', salary: 180000},
-  { role: 'Software Engineer I', company: 'Big Data Inc.', salary: 140000},
-  { role: 'CTO', company: 'Medium Data Inc.', salary: 215000},
-  { role: 'Technical Lead', company: 'Medium Data Inc.', salary: 165000},
-  { role: 'Software Engineer II', company: 'Medium Data Inc.', salary: 140000},
-  { role: 'Software Engineer I', company: 'Medium Data Inc.', salary: 115000},
-  { role: 'CTO', company: 'Small Data Inc.', salary: 175000},
-  { role: 'Technical Lead', company: 'Small Data Inc.', salary: 135000},
-  { role: 'Software Engineer II', company: 'Small Data Inc.', salary: 115000},
-  { role: 'Software Engineer I', company: 'Small Data Inc.', salary: 95000},
-];
+// TODO: Add your import statements here.
+import { getRoles, getCompanies } from './modules/salaryData.js';
+import {getAverageSalaryByRole, getAverageSalaryByCompany, getSalaryAtCompany, getIndustryAverageSalary } from './modules/workAroundModule.js';
 
-const getRoles = () => {
-  return ['CTO', 'Technical Lead', 'Software Engineer II', 'Software Engineer I'];
+// TODO: Get the companies and roles using the salaryData module.
+const companies = getCompanies();
+const roles = getRoles();
+
+// Create input buttons for every company and role represented in the data.
+renderInputButtons(companies, 'company');
+renderInputButtons(roles, 'role');
+
+// This function will create a new <section> with radio
+// inputs based on the data provided in the labels array.
+function renderInputButtons(labels, groupName) {
+  const container = document.createElement('section');
+  container.setAttribute('id', `${groupName}Inputs`);
+
+  let header = document.createElement('h3');
+  header.innerText = `Select a ${groupName}`;
+  container.appendChild(header);
+
+  labels.forEach(label => { // For each label...
+    // Create the radio input element.
+    let divElement = document.createElement('div');
+    divElement.setAttribute('class', 'option');
+
+    let inputElement = document.createElement('input');
+    inputElement.setAttribute('type', 'radio');
+    inputElement.setAttribute('name', groupName);
+    inputElement.setAttribute('value', label);
+    divElement.appendChild(inputElement);
+
+    // Create a label for that radio input element.
+    let labelElement = document.createElement('label');
+    labelElement.setAttribute('for', label);
+    labelElement.innerText = label;
+    divElement.appendChild(labelElement);
+
+    // Update the results when the input is selected.
+    inputElement.addEventListener('click', updateResults);
+
+    container.appendChild(divElement);
+  });
+
+  document.querySelector('main').prepend(container);
 }
 
-const getCompanies = () => {
-  return ['Big Data Inc.', 'Medium Data Inc.', 'Small Data Inc.'];
+function updateResults(){
+  // Get the current selected company and role from the radio button inputs.
+  const company = document.querySelector("input[name='company']:checked").value;
+  const role = document.querySelector("input[name='role']:checked").value;
+
+  // If either the company or role is unselected, return.
+  if (!company || !role) { return; }
+
+  // TODO: Use the workAroundModule functions to calculate the needed data.
+  const averageSalaryByRole = getAverageSalaryByRole(role);
+  const averageSalaryByCompany = getAverageSalaryByCompany(company);
+  const salary = getSalaryAtCompany(role, company);
+  const industryAverageSalary = getIndustryAverageSalary();
+
+  // Render them to the screen.
+  document.getElementById('salarySelected').innerText = `The salary for ${role}s at ${company} is \$${salary}`;
+  document.getElementById('salaryAverageByRole').innerText = `The industry average salary for ${role} positions is \$${averageSalaryByRole}`;
+  document.getElementById('salaryAverageByCompany').innerText = `The average salary at ${company} is \$${averageSalaryByCompany}`;
+  document.getElementById('salaryAverageIndustry').innerText = `The average salary in the Tech industry is \$${industryAverageSalary}`;
 }
-
-const getDataByRole = role => {
-  return salaryData.filter(obj => obj.role === role);
-}
-
-const getDataByCompany = company => {
-  return salaryData.filter(obj => obj.company === company);
-}
-
-
-
